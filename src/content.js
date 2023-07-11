@@ -13,19 +13,18 @@
 import { clipHTML } from "./clip";
 
 (() => {
-
   // add a listener here for eventual use by some Google Doc and Word plugin
   // which is getting complicated...
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message?.action == 'clip2tana') {
+    if (message?.action == "clip2tana") {
       console.log("Got action message");
       clipHTML(message.selection);
     }
-    return true
+    return true;
   });
 
-  function getSelectedHTML() {
+  const getSelectedHTML = () => {
     let html = "";
     if (typeof window.getSelection != "undefined") {
       const sel = window.getSelection();
@@ -35,14 +34,15 @@ import { clipHTML } from "./clip";
           container.appendChild(sel.getRangeAt(i).cloneContents());
         }
         html = container.innerHTML;
-      }
-      else {
-        console.log("No apparent selection - attempting MSOffice class selection");
+      } else {
+        console.log(
+          "No apparent selection - attempting MSOffice class selection"
+        );
 
         // TODO: this doesn't actually work unless you do it in the java
         // debug console. Why?
         // See open question https://stackoverflow.com/questions/75378711/how-to-get-selected-text-in-office365-word-document-from-within-a-chrome-extensi
-        const selection = document.getElementsByClassName('Selected');
+        const selection = document.getElementsByClassName("Selected");
         console.log(selection);
         const container = document.createElement("div");
         for (const node of selection) {
@@ -50,18 +50,17 @@ import { clipHTML } from "./clip";
         }
         html = container.innerHTML;
       }
-    }
-    else if (typeof document.selection != "undefined") {
-      if (document.selection.type == "Text") {
-        html = document.selection.createRange().htmlText;
-      }
+    } else if (
+      typeof document.selection != "undefined" &&
+      document.selection.type == "Text"
+    ) {
+      html = document.selection.createRange().htmlText;
     }
     return html;
-  }
+  };
 
   // actually do the work
   let html = getSelectedHTML();
 
   clipHTML(html);
-
 })();

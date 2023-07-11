@@ -1,4 +1,4 @@
-/* 
+/*
   background.js is the web worker code, which is basically "faceless" from a
   browser tab perspective.
 
@@ -8,12 +8,10 @@
 
 chrome.action.onClicked.addListener(async (tab) => {
   console.log("got click");
-  await chrome.scripting.executeScript(
-    {
-      target: { tabId: tab.id },
-      files: ["content.js"],
-    }
-  );
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["content.js"],
+  });
 });
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -23,4 +21,3 @@ chrome.runtime.onInstalled.addListener(() => {
   //   text: "WOKE",
   // });
 });
-

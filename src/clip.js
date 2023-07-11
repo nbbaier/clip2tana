@@ -1,4 +1,4 @@
-/* 
+/*
   clip.js prepares the HTML as markdown in tana-paste format
 */
 
@@ -6,10 +6,10 @@ import TurndownService from "turndown";
 
 export function clipHTML(html) {
   // this seems to help avoid "DOMException: not focused" errors from time to time
-  // ref: Stackoverflow 
+  // ref: Stackoverflow
   window.focus();
   // grab the basic info from the page
-  const title = document.title;
+  const { title } = document;
   const url = window.location.href;
   let description = "";
 
@@ -27,24 +27,15 @@ export function clipHTML(html) {
       fields.push("\n  - Description:: " + description);
     } else {
       let property = element.getAttribute("property");
-      let content = element.content;
-      if (property === "og:description") {
-        // no point in duplicating the description
-        if (content != description) {
-          fields.push("\n  - og:Description:: " + content);
-        }
+      let { content } = element;
+      if (property === "og:description" && content != description) {
+        fields.push("\n  - og:Description:: " + content);
       }
-      if (property === "og:title") {
-        // no point in duplicating the title
-        if (content !== title) {
-          fields.push("\n  - og:Title:: " + content);
-        }
+      if (property === "og:title" && content !== title) {
+        fields.push("\n  - og:Title:: " + content);
       }
-      if (property === "og:url") {
-        // no point in duplicating the url
-        if (content != url) {
-          fields.push("\n  - og:Url:: " + content);
-        }
+      if (property === "og:url" && content != url) {
+        fields.push("\n  - og:Url:: " + content);
       }
       if (property === "og:type") {
         fields.push("\n  - og:Type:: " + content);
@@ -77,25 +68,26 @@ export function clipHTML(html) {
       linkStyle: "inlined",
       preformattedCode: "true",
       blankReplacement: function (content, node) {
-        return node.isBlock ? '\n\n' : ''
+        return node.isBlock ? "\n\n" : "";
       },
-    }).addRule('baseUrl', {   // This rule constructs url to be absolute URLs for links & images
-      filter: ['a', 'img'],
+    }).addRule("baseUrl", {
+      // This rule constructs url to be absolute URLs for links & images
+      filter: ["a", "img"],
       replacement: function (content, el, options) {
-        if (el.nodeName === 'IMG') {
-          const link = el.getAttributeNode('src').value;
-          const fullLink = new URL(link, url)
-          return `![${content}](${fullLink.href})`
-        } else if (el.nodeName === 'A') {
-          const link = el.getAttributeNode('href').value;
-          const fullLink = new URL(link, url)
-          return `[${content}](${fullLink.href})`
+        if (el.nodeName === "IMG") {
+          const link = el.getAttributeNode("src").value;
+          const fullLink = new URL(link, url);
+          return `![${content}](${fullLink.href})`;
+        } else if (el.nodeName === "A") {
+          const link = el.getAttributeNode("href").value;
+          const fullLink = new URL(link, url);
+          return `[${content}](${fullLink.href})`;
         }
-      }
+      },
     });
 
     const clipping = markdownService.turndown(html);
-    clipping.split('\n').forEach((line) => {
+    clipping.split("\n").forEach((line) => {
       if (line.length > 0) {
         // strip any # symbols from the front of the line
         let frags = line.match(/^(#+ *)?(.*)/);
@@ -113,4 +105,4 @@ export function clipHTML(html) {
       console.error("Error copying data to clipboard: ", err);
     }
   );
-};
+}
